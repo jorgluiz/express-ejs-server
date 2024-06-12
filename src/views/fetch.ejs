@@ -1,0 +1,88 @@
+<!-- arquivo: pagina.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Usuários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Gerenciamento de Usuários</h1>
+
+        <!-- Formulário para busca de usuários -->
+        <form id="form-buscar">
+            <div class="input-group mb-3">
+                <button class="btn btn-primary" type="button" id="button-buscar">Buscar usuário</button>
+            </div>
+        </form>
+
+        <!-- Formulário para criação de usuários -->
+        <form id="formCreate" method="POST">
+            <div class="input-group mb-3">
+                <label for="name">Enter your name:
+                    <input type="text" name="name" id="name" required />
+                    <input type="text" name="idade" id="idade" required />
+                </label>
+                <button class="btn btn-success" type="button" id="button-criar">Criar User</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Inclua o link para o CDN do Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById('button-buscar').addEventListener('click', function (event) {
+            event.preventDefault(); // Evita o comportamento padrão do botão
+
+            fetch('/user-management/get', { // Realiza a requisição GET
+                method: 'GET',
+                // body: formData
+            }).then(response => {
+                return response.json(); // Retorna os dados da resposta como JSON
+            }).then(data => {
+                const form = document.getElementById('form-buscar')
+                const p1 = document.createElement('p')
+                const p2 = document.createElement('p')
+                p1.innerText = data.name
+                form.parentNode.insertBefore(p1, form.nextSibling)
+            }).catch(error => {
+                console.error('Erro:', error); // Exibe qualquer erro no console
+            });
+        });
+
+        // Adiciona um evento de escuta para o botão de busca
+        document.getElementById('button-criar').addEventListener('click', function (event) {
+            event.preventDefault(); // Evita o comportamento padrão do botão
+
+            const formData = {};
+            const formInputs = document.querySelectorAll('#formCreate input');
+            formInputs.forEach(input => {
+                if (input.type !== 'submit') {
+                    formData[input.name] = input.value;
+                }
+            });
+
+            fetch('/user-management/post', {
+                method: 'post',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData)
+            }).then(response => {
+                document.querySelector('#name').value = ""
+                document.querySelector('#idade').value = ""
+                return response.json(); // Retorna os dados da resposta como JSON
+            })
+        });
+    </script>
+</body>
+
+</html>
